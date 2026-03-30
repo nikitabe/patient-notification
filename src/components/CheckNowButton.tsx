@@ -10,6 +10,9 @@ interface Advancement {
   summary: string;
   importance: string;
   explanation: string;
+  dateOfAdvancement: string | null;
+  actionable: boolean;
+  actionableDetails: string | null;
   condition: { name: string };
 }
 
@@ -108,11 +111,25 @@ export default function CheckNowButton() {
                   <div className="flex items-start justify-between">
                     <div>
                       <h4 className="font-medium text-gray-900">{adv.title}</h4>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        Condition: {adv.condition.name}
-                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-xs text-gray-400">
+                          Condition: {adv.condition.name}
+                        </p>
+                        {adv.dateOfAdvancement && (
+                          <p className="text-xs text-gray-400">
+                            | {adv.dateOfAdvancement}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <ImportanceBadge importance={adv.importance} />
+                    <div className="flex items-center gap-2">
+                      {adv.actionable && (
+                        <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                          Actionable
+                        </span>
+                      )}
+                      <ImportanceBadge importance={adv.importance} />
+                    </div>
                   </div>
                   <p className="text-sm text-gray-700">{adv.summary}</p>
                   <div className="bg-blue-50 rounded-md p-3">
@@ -121,6 +138,14 @@ export default function CheckNowButton() {
                       {adv.explanation}
                     </p>
                   </div>
+                  {adv.actionable && adv.actionableDetails && (
+                    <div className="bg-purple-50 rounded-md p-3">
+                      <p className="text-sm text-purple-800">
+                        <span className="font-medium">What you can do: </span>
+                        {adv.actionableDetails}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

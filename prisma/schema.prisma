@@ -38,6 +38,9 @@ model Advancement {
   summary        String
   importance     String
   explanation    String
+  dateOfAdvancement String?
+  actionable     Boolean  @default(false)
+  actionableDetails String?
   discoveredAt   DateTime @default(now())
 
   condition    Condition    @relation(fields: [conditionId], references: [id], onDelete: Cascade)

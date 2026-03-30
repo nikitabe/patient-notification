@@ -62,6 +62,9 @@ export async function POST() {
               summary: a.summary,
               importance: a.importance,
               explanation: a.explanation,
+              dateOfAdvancement: a.dateOfAdvancement || null,
+              actionable: a.actionable ?? false,
+              actionableDetails: a.actionableDetails || null,
             }))
           ),
         },

@@ -5,6 +5,9 @@ export interface AdvancementResult {
   summary: string;
   importance: "HIGH" | "MEDIUM" | "LOW";
   explanation: string;
+  dateOfAdvancement: string | null;
+  actionable: boolean;
+  actionableDetails: string | null;
 }
 
 function getClient() {
@@ -31,9 +34,12 @@ For each advancement:
 2. summary: 2-3 sentence summary accessible to a non-medical audience
 3. importance: Rate as HIGH, MEDIUM, or LOW based on potential impact on patient care
 4. explanation: 1-2 sentences explaining why this matters specifically for someone with this condition
+5. dateOfAdvancement: The approximate date this advancement was published or announced (e.g. "March 2025", "Q1 2025", "2024"). Use null if unknown.
+6. actionable: true if this is something the patient can act on now (e.g. ask their doctor about a newly approved treatment, enroll in a trial), false if it's early-stage research or not yet available
+7. actionableDetails: If actionable is true, a brief explanation of what the patient can do (e.g. "Ask your doctor about this FDA-approved treatment"). Use null if not actionable.
 
 Return ONLY a JSON array with no other text. Example format:
-[{"title": "...", "summary": "...", "importance": "HIGH", "explanation": "..."}]`,
+[{"title": "...", "summary": "...", "importance": "HIGH", "explanation": "...", "dateOfAdvancement": "March 2025", "actionable": true, "actionableDetails": "Ask your doctor about..."}]`,
       },
     ],
   });
@@ -41,15 +47,13 @@ Return ONLY a JSON array with no other text. Example format:
   const text =
     message.content[0].type === "text" ? message.content[0].text : "";
 
-  // Extract JSON from the response (handle markdown code blocks)
   const jsonMatch = text.match(/\[[\s\S]*\]/);
   if (!jsonMatch) return [];
 
   try {
     const results = JSON.parse(jsonMatch[0]) as AdvancementResult[];
     return results.filter(
-      (r) =>
-        r.title && r.summary && r.importance && r.explanation
+      (r) => r.title && r.summary && r.importance && r.explanation
     );
   } catch {
     return [];

@@ -12,7 +12,7 @@ export default async function AdminPage() {
   const user = await clerk.users.getUser(userId);
   const email = user.emailAddresses[0]?.emailAddress;
 
-  if (!isAdmin(email)) redirect("/dashboard");
+  if (!(await isAdmin(email))) redirect("/dashboard");
 
   const settings = await getAllSettings();
 

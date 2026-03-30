@@ -1,6 +1,14 @@
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "me@nikitab.com").split(",").map(e => e.trim().toLowerCase());
+import { prisma } from "./prisma";
 
-export function isAdmin(email: string | null | undefined): boolean {
+const DEFAULT_ADMIN_EMAILS = "me@nikitab.com";
+
+export async function isAdmin(email: string | null | undefined): Promise<boolean> {
   if (!email) return false;
-  return ADMIN_EMAILS.includes(email.toLowerCase());
+
+  const setting = await prisma.setting.findUnique({ where: { key: "admin_emails" } });
+  const adminList = (setting?.value || DEFAULT_ADMIN_EMAILS)
+    .split(",")
+    .map((e) => e.trim().toLowerCase());
+
+  return adminList.includes(email.toLowerCase());
 }

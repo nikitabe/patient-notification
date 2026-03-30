@@ -11,7 +11,7 @@ async function requireAdmin() {
   const user = await clerk.users.getUser(userId);
   const email = user.emailAddresses[0]?.emailAddress;
 
-  if (!isAdmin(email)) return null;
+  if (!(await isAdmin(email))) return null;
   return userId;
 }
 

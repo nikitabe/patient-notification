@@ -2,6 +2,7 @@ import { prisma } from "./prisma";
 
 const defaults: Record<string, string> = {
   from_email: "HealthPulse <onboarding@resend.dev>",
+  admin_emails: "me@nikitab.com",
 };
 
 export async function getSetting(key: string): Promise<string> {

@@ -21,7 +21,7 @@ export default async function DashboardLayout({
       const clerk = await clerkClient();
       const user = await clerk.users.getUser(userId);
       const email = user.emailAddresses[0]?.emailAddress;
-      showAdmin = isAdmin(email);
+      showAdmin = await isAdmin(email);
     }
   } catch {
     // ignore - just don't show admin link

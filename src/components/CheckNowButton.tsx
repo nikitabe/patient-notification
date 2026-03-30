@@ -2,29 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import ImportanceBadge from "./ImportanceBadge";
-
-interface Advancement {
-  id: string;
-  title: string;
-  summary: string;
-  importance: string;
-  explanation: string;
-  dateOfAdvancement: string | null;
-  actionable: boolean;
-  actionableDetails: string | null;
-  condition: { name: string };
-}
 
 interface CheckResult {
   status: string;
   message?: string;
-  notification?: {
-    id: string;
-    subject: string;
-    sentAt: string;
-    advancements: Advancement[];
-  };
+  notification?: { id: string };
 }
 
 export default function CheckNowButton() {
@@ -61,7 +43,7 @@ export default function CheckNowButton() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <button
         onClick={handleCheck}
         disabled={loading}
@@ -80,77 +62,18 @@ export default function CheckNowButton() {
         )}
       </button>
 
-      {result && (
-        <div className="rounded-lg border p-4">
-          {result.status === "no_conditions" && (
-            <p className="text-amber-700 bg-amber-50 rounded-md p-3 text-sm">
-              {result.message}
-            </p>
-          )}
-
-          {result.status === "no_advancements" && (
-            <p className="text-gray-600 bg-gray-50 rounded-md p-3 text-sm">
-              {result.message}
-            </p>
-          )}
-
-          {result.status === "error" && (
-            <p className="text-red-700 bg-red-50 rounded-md p-3 text-sm">
-              {result.message}
-            </p>
-          )}
-
-          {result.status === "success" && result.notification && (
-            <div className="space-y-3">
-              <h3 className="font-semibold text-gray-900">
-                {result.notification.advancements.length} advancement
-                {result.notification.advancements.length !== 1 ? "s" : ""} found
-              </h3>
-              {result.notification.advancements.map((adv) => (
-                <div key={adv.id} className="bg-white rounded-lg border p-4 space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="font-medium text-gray-900">{adv.title}</h4>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-xs text-gray-400">
-                          Condition: {adv.condition.name}
-                        </p>
-                        {adv.dateOfAdvancement && (
-                          <p className="text-xs text-gray-400">
-                            | {adv.dateOfAdvancement}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {adv.actionable && (
-                        <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                          Actionable
-                        </span>
-                      )}
-                      <ImportanceBadge importance={adv.importance} />
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-700">{adv.summary}</p>
-                  <div className="bg-blue-50 rounded-md p-3">
-                    <p className="text-sm text-blue-800">
-                      <span className="font-medium">Why this matters: </span>
-                      {adv.explanation}
-                    </p>
-                  </div>
-                  {adv.actionable && adv.actionableDetails && (
-                    <div className="bg-purple-50 rounded-md p-3">
-                      <p className="text-sm text-purple-800">
-                        <span className="font-medium">What you can do: </span>
-                        {adv.actionableDetails}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      {result && result.status !== "success" && (
+        <p
+          className={`text-sm rounded-md p-3 ${
+            result.status === "no_conditions"
+              ? "text-amber-700 bg-amber-50"
+              : result.status === "no_advancements"
+                ? "text-gray-600 bg-gray-50"
+                : "text-red-700 bg-red-50"
+          }`}
+        >
+          {result.message}
+        </p>
       )}
     </div>
   );

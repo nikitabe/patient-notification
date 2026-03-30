@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import NotificationList from "@/components/NotificationList";
+import CheckNowButton from "@/components/CheckNowButton";
 
 export default async function NotificationsPage() {
   const { userId } = await auth();
@@ -20,11 +21,14 @@ export default async function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-        <p className="text-gray-500 mt-1">
-          Past advancement notifications sent to your email.
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
+          <p className="text-gray-500 mt-1">
+            Past advancement notifications sent to your email.
+          </p>
+        </div>
+        <CheckNowButton />
       </div>
 
       <NotificationList notifications={notifications} />

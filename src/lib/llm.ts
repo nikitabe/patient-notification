@@ -1,7 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic();
-
 export interface AdvancementResult {
   title: string;
   summary: string;
@@ -9,11 +7,15 @@ export interface AdvancementResult {
   explanation: string;
 }
 
+function getClient() {
+  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+}
+
 export async function discoverAdvancements(
   conditionName: string,
   userNotes: string | null
 ): Promise<AdvancementResult[]> {
-  const message = await client.messages.create({
+  const message = await getClient().messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 2048,
     messages: [

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { discoverAdvancements } from "@/lib/llm";
 import { sendAdvancementEmail } from "@/lib/email";
 
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   // Verify cron secret in production
   const authHeader = request.headers.get("authorization");

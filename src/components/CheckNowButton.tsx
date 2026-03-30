@@ -36,9 +36,12 @@ export default function CheckNowButton() {
       const res = await fetch("/api/check-now", { method: "POST" });
       const data = await res.json();
       setResult(data);
-      router.refresh();
-    } catch {
-      setResult({ status: "error", message: "Something went wrong. Please try again." });
+      if (data.status === "success") router.refresh();
+    } catch (err) {
+      setResult({
+        status: "error",
+        message: err instanceof Error ? err.message : "Something went wrong. Please try again.",
+      });
     } finally {
       setLoading(false);
     }

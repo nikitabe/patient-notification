@@ -34,7 +34,17 @@ export default function CheckNowButton() {
     setResult(null);
     try {
       const res = await fetch("/api/check-now", { method: "POST" });
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setResult({
+          status: "error",
+          message: `Server returned ${res.status}: ${text.slice(0, 200)}`,
+        });
+        return;
+      }
       setResult(data);
       if (data.status === "success") router.refresh();
     } catch (err) {

@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import type { AdvancementResult } from "./llm";
+import { getSetting } from "./settings";
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
@@ -18,6 +19,8 @@ export async function sendAdvancementEmail(
     advancements: AdvancementResult[];
   }>
 ) {
+  const fromEmail = await getSetting("from_email");
+
   const advancementHtml = conditionAdvancements
     .map(
       ({ conditionName, advancements }) => `
@@ -32,12 +35,20 @@ export async function sendAdvancementEmail(
               ${a.importance}
             </span>
           </div>
+          ${a.dateOfAdvancement ? `<p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">${a.dateOfAdvancement}</p>` : ""}
           <p style="color:#4b5563;margin:8px 0;">${a.summary}</p>
           <div style="background:#eff6ff;border-radius:6px;padding:12px;margin-top:8px;">
             <p style="color:#1e40af;margin:0;font-size:14px;">
               <strong>Why this matters:</strong> ${a.explanation}
             </p>
           </div>
+          ${a.actionable && a.actionableDetails ? `
+          <div style="background:#faf5ff;border-radius:6px;padding:12px;margin-top:8px;">
+            <p style="color:#7e22ce;margin:0;font-size:14px;">
+              <strong>What you can do:</strong> ${a.actionableDetails}
+            </p>
+          </div>
+          ` : ""}
         </div>
       `
         )
@@ -59,7 +70,7 @@ export async function sendAdvancementEmail(
   `;
 
   await getResend().emails.send({
-    from: "HealthPulse <onboarding@resend.dev>",
+    from: fromEmail,
     to,
     subject: "New Health Advancements Found",
     html,

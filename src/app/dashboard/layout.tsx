@@ -1,5 +1,7 @@
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { isAdmin } from "@/lib/admin";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -7,11 +9,24 @@ const navItems = [
   { href: "/dashboard/notifications", label: "Notifications" },
 ];
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  let showAdmin = false;
+  try {
+    const { userId } = await auth();
+    if (userId) {
+      const clerk = await clerkClient();
+      const user = await clerk.users.getUser(userId);
+      const email = user.emailAddresses[0]?.emailAddress;
+      showAdmin = isAdmin(email);
+    }
+  } catch {
+    // ignore - just don't show admin link
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b">
@@ -30,6 +45,14 @@ export default function DashboardLayout({
                   {item.label}
                 </Link>
               ))}
+              {showAdmin && (
+                <Link
+                  href="/dashboard/admin"
+                  className="text-sm text-purple-600 hover:text-purple-900 transition"
+                >
+                  Admin
+                </Link>
+              )}
             </nav>
           </div>
           <UserButton />

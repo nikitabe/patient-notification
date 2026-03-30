@@ -49,3 +49,9 @@ model Advancement {
   @@index([conditionId])
   @@index([notificationId])
 }
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

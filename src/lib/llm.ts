@@ -20,32 +20,46 @@ export async function discoverAdvancements(
 ): Promise<AdvancementResult[]> {
   const message = await getClient().messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
+    max_tokens: 4096,
+    tools: [
+      {
+        type: "web_search_20250305",
+        name: "web_search",
+        max_uses: 5,
+      },
+    ],
     messages: [
       {
         role: "user",
-        content: `You are a medical research analyst. Identify 3-5 recent noteworthy advancements, treatments, clinical trials, or research breakthroughs relevant to the following health condition.
+        content: `You are a medical research analyst. Search the web for the most recent advancements, treatments, clinical trials, or research breakthroughs relevant to the following health condition. Focus on developments from the last 6 months.
 
 Condition: ${conditionName}
 ${userNotes ? `Additional context from the patient: ${userNotes}` : ""}
+
+Please search for recent news and research about this condition, then provide 3-5 findings.
 
 For each advancement:
 1. title: A clear, concise title
 2. summary: 2-3 sentence summary accessible to a non-medical audience
 3. importance: Rate as HIGH, MEDIUM, or LOW based on potential impact on patient care
 4. explanation: 1-2 sentences explaining why this matters specifically for someone with this condition
-5. dateOfAdvancement: The approximate date this advancement was published or announced (e.g. "March 2025", "Q1 2025", "2024"). Use null if unknown.
+5. dateOfAdvancement: The date this advancement was published or announced (e.g. "March 2025"). Use null if unknown.
 6. actionable: true if this is something the patient can act on now (e.g. ask their doctor about a newly approved treatment, enroll in a trial), false if it's early-stage research or not yet available
 7. actionableDetails: If actionable is true, a brief explanation of what the patient can do (e.g. "Ask your doctor about this FDA-approved treatment"). Use null if not actionable.
 
-Return ONLY a JSON array with no other text. Example format:
+After searching, return ONLY a JSON array with no other text. Example format:
 [{"title": "...", "summary": "...", "importance": "HIGH", "explanation": "...", "dateOfAdvancement": "March 2025", "actionable": true, "actionableDetails": "Ask your doctor about..."}]`,
       },
     ],
   });
 
-  const text =
-    message.content[0].type === "text" ? message.content[0].text : "";
+  // Extract text from the response, skipping tool use/result blocks
+  let text = "";
+  for (const block of message.content) {
+    if (block.type === "text") {
+      text += block.text;
+    }
+  }
 
   const jsonMatch = text.match(/\[[\s\S]*\]/);
   if (!jsonMatch) return [];
